@@ -56,6 +56,9 @@ extern NSString *_Nullable SRStreamNetworkServiceTypeFromURLRequest(NSURLRequest
     NSString *networkServiceType = nil;
     switch (request.networkServiceType) {
         case NSURLNetworkServiceTypeDefault:
+        case NSURLNetworkServiceTypeResponsiveData:
+        case NSURLNetworkServiceTypeAVStreaming:
+        case NSURLNetworkServiceTypeResponsiveAV:
             break;
         case NSURLNetworkServiceTypeVoIP:
             networkServiceType = NSStreamNetworkServiceTypeVoIP;
@@ -69,16 +72,12 @@ extern NSString *_Nullable SRStreamNetworkServiceTypeFromURLRequest(NSURLRequest
         case NSURLNetworkServiceTypeVoice:
             networkServiceType = NSStreamNetworkServiceTypeVoice;
             break;
-        default:
-            break;
+        case NSURLNetworkServiceTypeCallSignaling: {
+            if (@available(iOS 10.0, tvOS 10.0, macOS 10.12, *)) {
+                networkServiceType = NSStreamNetworkServiceTypeCallSignaling;
+            }
+        } break;
     }
-
-    if (@available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)) {
-        if (!networkServiceType && request.networkServiceType == NSURLNetworkServiceTypeCallSignaling) {
-            networkServiceType = NSStreamNetworkServiceTypeCallSignaling;
-        }
-    }
-
     return networkServiceType;
 }
 

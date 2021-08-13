@@ -431,10 +431,11 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     }
 
     [self _readUntilHeaderCompleteWithCallback:^(SRWebSocket *socket,  NSData *data) {
-        CFHTTPMessageAppendBytes(self->_receivedHTTPHeaders, (const UInt8 *)data.bytes, data.length);
+        CFHTTPMessageRef receivedHeaders = self->_receivedHTTPHeaders;
+        CFHTTPMessageAppendBytes(receivedHeaders, (const UInt8 *)data.bytes, data.length);
 
-        if (CFHTTPMessageIsHeaderComplete(self->_receivedHTTPHeaders)) {
-            SRDebugLog(@"Finished reading headers %@", CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(self->_receivedHTTPHeaders)));
+        if (CFHTTPMessageIsHeaderComplete(receivedHeaders)) {
+            SRDebugLog(@"Finished reading headers %@", CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(receivedHeaders)));
             [self _HTTPHeadersDidFinish];
         } else {
             [self _readHTTPHeader];
@@ -977,7 +978,7 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
             return;
         }
 
-        size_t extra_bytes_needed = header.masked ? sizeof(self->_currentReadMaskKey) : 0;
+        size_t extra_bytes_needed = header.masked ? sizeof(sself->_currentReadMaskKey) : 0;
 
         if (header.payload_length == 126) {
             extra_bytes_needed += sizeof(uint16_t);
@@ -1015,7 +1016,7 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
                 }
 
                 if (header.masked) {
-                    assert(mapped_size >= sizeof(self->_currentReadMaskOffset) + offset);
+                    assert(mapped_size >= sizeof(eself->_currentReadMaskOffset) + offset);
                     memcpy(eself->_currentReadMaskKey, ((uint8_t *)mapped_buffer) + offset, sizeof(eself->_currentReadMaskKey));
                 }
 
@@ -1349,7 +1350,7 @@ static const size_t SRFrameHeaderOverhead = 32;
     uint8_t *frameBuffer = (uint8_t *)frameData.mutableBytes;
 
     // set fin
-    frameBuffer[0] = SRFinMask | (uint8_t)opCode;
+    frameBuffer[0] = SRFinMask | opCode;
 
     // set the mask and header
     frameBuffer[1] |= SRMaskMask;

@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     __block id<SRWebSocketDelegate> delegate = nil;
     dispatch_sync(self.accessQueue, ^{
-        delegate = _delegate;
+        delegate = self->_delegate;
     });
     return delegate;
 }
@@ -84,7 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     __block dispatch_queue_t queue = nil;
     dispatch_sync(self.accessQueue, ^{
-        queue = _dispatchQueue;
+        queue = self->_dispatchQueue;
     });
     return queue;
 }
@@ -101,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     __block NSOperationQueue *queue = nil;
     dispatch_sync(self.accessQueue, ^{
-        queue = _operationQueue;
+        queue = self->_operationQueue;
     });
     return queue;
 }
@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
     __block __strong id<SRWebSocketDelegate> delegate = nil;
     __block SRDelegateAvailableMethods availableMethods = {};
     dispatch_sync(self.accessQueue, ^{
-        delegate = _delegate; // Not `OK` to go through `self`, since queue sync.
+        delegate = self->_delegate; // Not `OK` to go through `self`, since queue sync.
         availableMethods = self.availableDelegateMethods; // `OK` to call through `self`, since no queue sync.
     });
     [self performDelegateQueueBlock:^{
